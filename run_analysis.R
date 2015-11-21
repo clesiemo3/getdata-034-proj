@@ -53,4 +53,5 @@ colnames(dfTrim) <- lapply(colnames(dfTrim),FUN=function(trim){
 mdata <- melt(dfTrim,id=c("Subject","Activity")) #melt our data down to Subject+Activity level
 by_subjAct <- mdata %>% group_by(Subject,Activity,variable) #group by our non-value variables
 tidyDf <- by_subjAct %>% summarize_each(funs(mean),value) #summarize our data by mean value
+tidyDf <- arrange(tidyDf,Subject,Activity,variable)
 write.table(tidyDf,file="tidy.txt") #writes our tidy data to a file for sharing
