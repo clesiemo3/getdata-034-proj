@@ -7,6 +7,7 @@
 #   the average of each variable for each activity and each subject.
 
 library(dplyr)
+library(reshape2)
 
 #First we need to get our data into R
 features <- read.table("./UCI HAR Dataset/features.txt")
