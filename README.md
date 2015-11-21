@@ -1,19 +1,32 @@
 # getdata-034-proj
-The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 1) a tidy data set as described below, 2) a link to a Github repository with your script for performing the analysis, and 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.  
 
-One of the most exciting areas in all of data science right now is wearable computing - see for example this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained: 
+The purpose of this project is to take a messy input of Samsung Wearable data and process it into a data set that follows "tidy data" standards.
 
-http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
+run_analysis.R is the script that does all of the work. The pre-requisite for this script to work is to unzip the source data into your working directory. Data can be found at this address: https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip or by cloning this github repository. Further information about this source data can be found within the readme provided or the following website: http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
 
-Here are the data for the project: 
+The overall components the script implements are the following:
 
-https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
+1. Merges the training and the test sets to create one data set.
+2. Extracts only the measurements on the mean and standard deviation for each measurement. 
+3. Uses descriptive activity names to name the activities in the data set
+4. Appropriately labels the data set with descriptive variable names. 
+5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
- You should create one R script called run_analysis.R that does the following. 
-Merges the training and the test sets to create one data set.
-Extracts only the measurements on the mean and standard deviation for each measurement. 
-Uses descriptive activity names to name the activities in the data set
-Appropriately labels the data set with descriptive variable names. 
-From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+## Reading the Data ##
+`read.table` function calls are used to load the various text files included in the data set that will be combined. The data comes in two forms: referential and transactional. 
 
-Good luck!
+Reference data is given for understanding the column names of the test and training data in features.txt and translation from integers to text for activities performed. Properly applying this reference data to the transactional data is key in having the correct data.
+
+Transactional Data is split between test and training data which needs to be combined. Within these categories are `x_test.txt`, `y_test.txt`, and `subject_test.txt` (with test replaced with train for training data). More granular lower level data for the `x_train.txt` and `x_test.txt` data sets can be found within the Inertial Signals subfolder. This data was not used in this script's processing but is available for further investigation if so desired.
+
+## Combining the Data into one data set and applying reference data ##
+
+After loading the data into R transactional data was merged with Activity reference data and combined into a data frame for each category. Each of these data frames are combined with an rbind due to each referring to separate subjects but the same types of observations for those subjects. Lastly column names are applied across the data frame from the provided features reference data replacing V1,V2,V3... with more descriptive variables.
+
+## Rename Columns to be more descriptive and easier to read ##
+
+Using gsub and sub we are able to apply some simple substitutions to enhance readability while maintaining consistency compared to renaming columns 1 at a time.
+
+## Create Tidy Data Set ##
+
+Lastly the data is transformed into a tidy format that provides the average of each variable for each unique Subject and Activity combination. This is performed through the use of the dplyr and reshape2 packages. First using `melt()` from reshape2 to melt our data into a tidy form where each variable is in its own row. After melting the data is grouped by Subject, Activity, and variable with `group_by()` from dplyr and then summarized by those groups with `summarize_each()` applying the `mean()` function to the data. The data is sorted through `arrange()` and then written to a text file for sharing.
